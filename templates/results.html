@@ -1,0 +1,48 @@
+{%extends 'base.html'%}
+
+{%block title%}result page{%endblock%}
+
+{%block content%}
+
+<h2> results are here</h2>
+{% if match_score is not none %}
+    <h3>Match Score: {{ match_score|round(2) }}%</h3>
+    <div class="progress-bar">
+        <div class="progress" style="width: {{ match_score }}%;">{{ match_score|round(2) }}%</div>
+    </div>
+{% else %}
+    <p>No match score available</p>
+{% endif %}
+
+{% if matched_skills %}
+    <h3>Matched Skills</h3>
+    <ul>
+        {% for skill in matched_skills %}
+            <li>✅ {{ skill }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No matched skills found</p>
+{% endif %}
+
+{% if matched_keywords %}
+    <h3>Matched Keywords</h3>
+    <ul>
+        {% for keyword in matched_keywords %}
+            <li>📌 {{ keyword }}</li>
+        {%endfor%}
+    </ul>
+{% else %}
+    <p>No matched keywords found</p>
+{% endif %}
+
+<span id="results-block" >
+        <p>results are going to show here if they are avilaible </p>
+    </span>
+{%if extracted_text%}
+<textarea rows="10" cols="80" readonly>{{extracted_text}}</textarea>
+{%else%}
+<p>No extracted text available</p>
+{%endif%}
+
+{%endblock%}

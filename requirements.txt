@@ -1,0 +1,9 @@
+Flask
+PyPDF2
+python-docx
+nltk
+scikit-learn
+numpy
+pandas
+matplotlib
+pymupdf

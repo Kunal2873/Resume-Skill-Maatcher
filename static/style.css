@@ -1,0 +1,138 @@
+/* ----- General Styles ----- */
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: #333;
+    text-align: center;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+/* ----- Navbar Styling ----- */
+.navbar {
+    background-color: #007bff;
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+}
+
+.navbar a:hover {
+    background-color: #0056b3;
+    border-radius: 5px;
+}
+
+/* ----- Upload Form Styling ----- */
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* ----- Flash Messages ----- */
+.flash-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.flash-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+/* ----- Results Page Styling ----- */
+#results-block {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    resize: none;
+}
+
+/* ----- Progress Bar ----- */
+.progress-bar {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.progress {
+    height: 25px;
+    background: linear-gradient(90deg, #4caf50, #2e7d32);
+    text-align: center;
+    color: white;
+    line-height: 25px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+/* ----- Matched Skills and Keywords ----- */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    font-size: 18px;
+    background-color: #e0f7fa;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+ul li::before {
+    content: "✔ ";
+    color: #2e7d32;
+    font-weight: bold;
+}

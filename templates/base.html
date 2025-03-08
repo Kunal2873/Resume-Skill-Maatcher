@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%} Flask app {%endblock%}</title>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='style.css')}}">
+</head>
+<body>
+<header>
+    <h1> My Flask Application</h1>
+</header>
+    <nav class="navbar">
+        <a href="{{url_for('welcome')}}"  > HOME </a>
+        <a  href="{{url_for('upload')}}"> Upload</a>
+        <a href="{{url_for('results')}}">result page </a>
+        <a href="{{url_for('help')}}">HELP</a>
+    </nav>
+<div class="container">
+{%block content%}{%endblock%}
+</body>
+</html>

@@ -1,0 +1,26 @@
+{%extends 'base.html'%}
+{%block title%}upload{%endblock%}
+{%block content%}
+<h2>uploading section</h2>
+<form method = "POST" enctype="multipart/form-data">
+    <label>Select file Type:</label><br>
+    <input type="radio" id='resume' name="file_type" value="resume" required>
+    <label for="resume" >Resume</label>
+    <input type="radio" id="job_description" name="file_type"  value="job_description">
+    <label for="job_description" >Job Description</label>
+    <br><br>
+    <input type="file" name="file"  required>
+    <br><br>
+    <input type="submit" value="Upload" >
+
+
+
+
+
+</form>
+{%if extracted_text%}
+     <h3>Extracted Text:</h3>
+     <textarea rows="10" cols="80" readonly>{{extracted_text}}</textarea>
+{%endif%}
+
+{%endblock%}

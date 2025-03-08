@@ -1,0 +1,15 @@
+Basic Resume
+Name: John Doe
+Job Title: Software Engineer
+Skills:
+- Python
+- Flask
+- SQL
+- Machine Learning
+Experience:
+- 2+ years in backend development
+- Developed RESTful APIs using Flask
+- Integrated SQL databases with Flask applications
+- Optimized backend performance for high-traffic applications
+Education:
+- B.Sc. in Computer Science, XYZ University, 2020
