@@ -2,25 +2,68 @@
 {%block title%}upload{%endblock%}
 {%block content%}
 <h2>uploading section</h2>
-<form method = "POST" enctype="multipart/form-data">
-    <label>Select file Type:</label><br>
-    <input type="radio" id='resume' name="file_type" value="resume" required>
-    <label for="resume" >Resume</label>
-    <input type="radio" id="job_description" name="file_type"  value="job_description">
-    <label for="job_description" >Job Description</label>
-    <br><br>
-    <input type="file" name="file"  required>
-    <br><br>
-    <input type="submit" value="Upload" >
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
+<form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="resume_file">Upload Resume:</label>
+        <input type="file" name="resume_file" id="resume_file" required>
+    </div>
 
+    <div class="form-group">
+        <label for="job_file">Upload Job Description:</label>
+        <input type="file" name="job_file" id="job_file" required>
+    </div>
 
-
+    <br>
+    <input type="submit" value="Upload" class="btn btn-primary">
 </form>
-{%if extracted_text%}
-     <h3>Extracted Text:</h3>
-     <textarea rows="10" cols="80" readonly>{{extracted_text}}</textarea>
-{%endif%}
 
-{%endblock%}
+{% if resume_text %}
+    <div id="result-block">
+        <h3>Resume Text:</h3>
+        <textarea rows="10" cols="80" readonly>{{ resume_text }}</textarea>
+        <h3>Job Description Text:</h3>
+        <textarea rows="5" cols="80" readonly>{{ job_text }}</textarea>
+
+        {% if match_score %}
+            <h3>Match Score:</h3>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ match_score }}%;">{{ match_score|round(1) }}%</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div style="width: 48%;">
+                    <h3>Matched Skills:</h3>
+                    <ul>
+                        {% for skill in matched_skills %}
+                            <li>{{ skill }}</li>
+                        {% else %}
+                            <li style="background-color: #f8d7da;">No matched skills found</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div style="width: 48%;">
+                    <h3>Matched Keywords:</h3>
+                    <ul>
+                        {% for keyword in matched_keywords %}
+                            <li>{{ keyword }}</li>
+                        {% else %}
+                            <li style="background-color: #f8d7da;">No matched keywords found</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

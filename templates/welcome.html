@@ -1,8 +1,29 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block title %}Welcome{% endblock %}
-
 {% block content %}
-    <h2>Welcome to My Flask Application</h2>
-    <p>This is the homepage of our application. Use the navigation bar above to explore other sections.</p>
-{% endblock %}
+<h2>Welcome to Resume Skills Matcher</h2>
+
+<div style="text-align: left; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+    <h3>How it works:</h3>
+    <ol>
+        <li>Upload your resume and a job description</li>
+        <li>Our system will extract skills and keywords from both documents</li>
+        <li>We'll calculate a match score based on how well your skills align with the job requirements</li>
+        <li>You'll see which skills match and where you might need to focus</li>
+    </ol>
+
+    <h3>Supported file formats:</h3>
+    <ul style="list-style-type: disc;">
+        <li>PDF (.pdf)</li>
+        <li>Microsoft Word (.docx)</li>
+        <li>Plain Text (.txt)</li>
+    </ul>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/upload" style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Get Started
+        </a>
+    </div>
+</div>
+
+{% endblock %}`

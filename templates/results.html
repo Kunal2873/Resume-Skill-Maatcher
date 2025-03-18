@@ -1,48 +1,49 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
+{% block title %}Results{% endblock %}
+{% block content %}
+<h2>Resume Analysis Results</h2>
 
-{%block title%}result page{%endblock%}
+{% if match_score is defined %}
+    <div id="results-block">
+        <h3>Match Score:</h3>
+        <div class="progress-bar">
+            <div class="progress" style="width: {{ match_score }}%;">{{ match_score|round(1) }}%</div>
+        </div>
 
-{%block content%}
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <div style="width: 48%;">
+                <h3>Matched Skills:</h3>
+                <ul>
+                    {% for skill in matched_skills %}
+                        <li>{{ skill }}</li>
+                    {% else %}
+                        <li style="background-color: #f8d7da;">No matched skills found</li>
+                    {% endfor %}
+                </ul>
+            </div>
 
-<h2> results are here</h2>
-{% if match_score is not none %}
-    <h3>Match Score: {{ match_score|round(2) }}%</h3>
-    <div class="progress-bar">
-        <div class="progress" style="width: {{ match_score }}%;">{{ match_score|round(2) }}%</div>
+            <div style="width: 48%;">
+                <h3>Matched Keywords:</h3>
+                <ul>
+                    {% for keyword in matched_keywords %}
+                        <li>{{ keyword }}</li>
+                    {% else %}
+                        <li style="background-color: #f8d7da;">No matched keywords found</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <h3>Resume Text:</h3>
+        <textarea rows="5" cols="80" readonly>{{ resume_text }}</textarea>
+
+        <h3>Job Description Text:</h3>
+        <textarea rows="5" cols="80" readonly>{{ job_text }}</textarea>
     </div>
 {% else %}
-    <p>No match score available</p>
+    <div class="flash-error">
+        No analysis results found. Please <a href="/upload">upload files</a> first.
+    </div>
 {% endif %}
 
-{% if matched_skills %}
-    <h3>Matched Skills</h3>
-    <ul>
-        {% for skill in matched_skills %}
-            <li>✅ {{ skill }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No matched skills found</p>
-{% endif %}
-
-{% if matched_keywords %}
-    <h3>Matched Keywords</h3>
-    <ul>
-        {% for keyword in matched_keywords %}
-            <li>📌 {{ keyword }}</li>
-        {%endfor%}
-    </ul>
-{% else %}
-    <p>No matched keywords found</p>
-{% endif %}
-
-<span id="results-block" >
-        <p>results are going to show here if they are avilaible </p>
-    </span>
-{%if extracted_text%}
-<textarea rows="10" cols="80" readonly>{{extracted_text}}</textarea>
-{%else%}
-<p>No extracted text available</p>
-{%endif%}
-
-{%endblock%}
+{% endblock %}

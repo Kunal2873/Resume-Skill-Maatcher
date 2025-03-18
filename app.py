@@ -1,12 +1,11 @@
+
+
 from flask import Flask,render_template,request,session
 import os, uuid,time
 
-from fontTools.subset import save_font
-from matplotlib.artist import kwdoc
-from pandas.io.sas.sas_constants import file_type_length
 from werkzeug.utils import secure_filename
 from flask import flash
-import document_processor
+
 from document_processor import extract_text
 from feature_extractor import extract_ngrams,map_to_taxonomy,normalize_text
 
@@ -41,12 +40,12 @@ def generate_unique_filename(filename):
     ext=filename.rsplit('.',1)[1].lower()
     unique_name=f"{uuid.uuid4()}.{ext}"
     return unique_name
-
-def create_unique_filename_time(filename):
-    ext=filename.rsplit('.',1)[1].lower()
-    timestamp=str(int(time.time()))  #time in seconds now
-    unique_time=f"{timestamp}_{filename}"
-    return unique_time
+#
+# def create_unique_filename_time(filename):
+#     ext=filename.rsplit('.',1)[1].lower()
+#     timestamp=str(int(time.time()))  #time in seconds now
+#     unique_time=f"{timestamp}_{filename}"
+#     return unique_time
 
 def calculate_match_score(resume_data,job_data):
     score=0
@@ -57,7 +56,7 @@ def calculate_match_score(resume_data,job_data):
 
     matched_skills=set(resume_skills)&set(job_skills)
     if matched_skills:
-       score+=len(matched_skills)*WEIGHTS["skills"]
+        score+=len(matched_skills)*WEIGHTS["skills"]
 
     resume_keywords=[kw.lower()for kw in resume_data.get('keywords',[])]
     job_keywords=[kw.lower() for kw in job_data.get('keywords',[])]
@@ -65,23 +64,14 @@ def calculate_match_score(resume_data,job_data):
 
     matched_keywords=set(resume_keywords)&set(job_keywords)
     if matched_keywords:
-       score+=len(matched_keywords)*WEIGHTS['keywords']
+        score+=len(matched_keywords)*WEIGHTS['keywords']
 
     resume_education = resume_data.get("education", [])
     job_education = job_data.get("education", [])
 
     # Check if any education requirement matches
-    education_match = False
-    if resume_education and job_education:
-        for job_edu in job_education:
-            for resume_edu in resume_education:
-                if job_edu.lower() in resume_edu.lower() or resume_edu.lower() in job_edu.lower():
-                    education_match = True
-                    break
-            if education_match:
-                break
-            if education_match:
-                break
+    education_match = any(job_edu.lower() in resume_edu.lower() for job_edu in job_education for resume_edu in resume_education)
+
     if education_match:
         score += WEIGHTS["education"]
 
@@ -102,78 +92,108 @@ def welcome():
 @app.route('/upload',methods=["GET","POST"])
 def upload():
     if request.method=="POST":
-        if 'file' not in request.files or 'file_type' not in request.form:
-            flash('Error: Missing file or selection.', "error")
+        if 'resume_file' not in request.files or 'job_file' not in request.files:
+            flash('Error: Missing file or selection. Please upload both resume and job description files.', "error")
+            return render_template('upload.html')
+        resume_file = request.files['resume_file']
+        job_file = request.files['job_file']
+
+        if resume_file.filename == "" or job_file.filename == "":
+            flash("Error: Both files must be selected.", "error")
             return render_template('upload.html')
 
-        file=request.files['file']
-        file_type=request.form['file_type']
-
-        if file.filename=="":
-            flash('Error: no file selected',"error")
+        if not allowed_file(resume_file.filename) or not allowed_file(job_file.filename):
+            flash("Error: Only PDF, DOCX, and TXT files are allowed.", "error")
             return render_template('upload.html')
 
-        if not allowed_file(file.filename):
-            flash('Error:only DOCX,PDF and TXT file are allowed','error')
-            return render_template('upload.html')
 
-        file.seek(0, os.SEEK_END)
-        file_size = file.tell()
-        file.seek(0)
+        resume_filename=generate_unique_filename(resume_file.filename)
+        job_unique_filename=generate_unique_filename(job_file.filename)
 
-        if file_size > MAX_FILE_SIZE:
-            flash(f'Error: File exceeds maximum size limit of {MAX_FILE_SIZE / 1024 / 1024:.1f}MB', 'error')
-            return render_template('upload.html'), 400
+        resume_path = os.path.join(RESUME_FOLDER, resume_filename)
+        job_path = os.path.join(JOB_DESC_FOLDER, job_unique_filename)
+
+        resume_file.save(resume_path)
+        job_file.save(job_path)
 
         try:
-            filename=secure_filename(file.filename)
-            unique_filename=generate_unique_filename(filename)
-
-            if file_type=='resume':
-                save_folder=RESUME_FOLDER
-            elif file_type=='job_description':
-                save_folder=JOB_DESC_FOLDER
-            else:
-                flash('inavlid file type selected','error')
-                return render_template('upload.html'),400
-            os.makedirs(save_folder,exist_ok=True)
-            file_path = os.path.join(save_folder, unique_filename)
-            file.save(file_path)  # Save the file securely
-
-            extracted_text=extract_text(file_path)
-            session['file_path']=file_path
-            session['extracted_text']=extracted_text
-            print("extracted text stored in session",session.get('extracted_text'))
-
-            normalized_text=normalize_text(extracted_text)
-            extracted_keywords=extract_ngrams(normalized_text,num_keywords=10,ngram_range=(1,3))
-            matched_skills=map_to_taxonomy(extracted_keywords)
-
-            session['extracted_keywords']=extracted_keywords
-            session['matched_skills']=matched_skills
-
-            text_file_path=file_path+'.txt'
-            with open(text_file_path,'w',encoding='utf-8')as text_file:
-                text_file.write(extracted_text)
-
-            flash(f"File uploaded successfully: {unique_filename}",'success')
-            return render_template('upload.html',extracted_text=extracted_text)
+            resume_text = extract_text(resume_path)
+            job_text = extract_text(job_path)
 
         except Exception as e:
-            flash( f"Error:could not save the file.{str(e)}",'error')
-            return render_template('upload.html'),500
-    extracted_text=session.get('extracted_text','')
-    return render_template('upload.html',extracted_text=extracted_text)
+            flash(f"Error saving files: {str(e)}", "error")
+            return render_template('upload.html')
+        try:
+            if not os.path.exists(resume_path) or os.path.getsize(resume_path) == 0:
+                flash("Error: Missing file or selection. Resume file could not be saved correctly.", "error")
+                return render_template('upload.html')
+
+            if not os.path.exists(job_path) or os.path.getsize(job_path) == 0:
+                flash("Error: Missing file or selection. Job description file could not be saved correctly.", "error")
+                return render_template('upload.html')
+
+            resume_text = extract_text(resume_path)
+            job_text = extract_text(job_path)
+
+            # Check if text extraction was successful
+            if not resume_text or not job_text:
+                flash("Error: Could not extract text from uploaded files. Please ensure files contain readable text.","error")
+                return render_template('upload.html')
+
+            normalized_resume = normalize_text(resume_text)
+            normalized_job = normalize_text(job_text)
+
+            resume_keywords=extract_ngrams(normalized_resume,num_keywords=10,ngram_range=(1,3))
+            job_keywords=extract_ngrams(normalized_job,num_keywords=10,ngram_range=(1,3))
+
+            matched_resume_skills=map_to_taxonomy(resume_keywords)
+            matched_job_skills=map_to_taxonomy(job_keywords)
+
+            resume_education=[]
+            job_education=[]
+            session['resume_text']=resume_text
+            session['job_text']=job_text
+            session['resume_keywords'] = resume_keywords
+            session['job_keywords'] = job_keywords
+            session['resume_skills'] = matched_resume_skills
+            session['job_skills'] = matched_job_skills
+            session['resume_education'] = resume_education
+            session['job_education'] = job_education
+
+
+            flash("Files uploaded and processed successfully!", "success")
+            resume_data = {
+                "text": resume_text,
+                "keywords": resume_keywords,
+                "skills": matched_resume_skills,
+                "education": resume_education,
+            }
+
+            job_data = {
+                "text": job_text,
+                "keywords": job_keywords,
+                "skills": matched_job_skills,
+                "education": job_education,
+            }
+            match_score, matched_skills, matched_keywords = calculate_match_score(resume_data, job_data)
+
+            return render_template("upload.html", resume_text=resume_text, job_text=job_text, matched_resume_skills=matched_resume_skills, matched_job_skills=matched_job_skills,match_score=match_score,matched_skills=matched_skills,matched_keywords=matched_keywords)
+        except Exception as e:
+            flash(f"Error processing files: {str(e)}", "error")
+            return render_template('upload.html')
+
+    return render_template('upload.html')
+
 
 @app.route('/results')
 def results():
-    extracted_text=session.get('extracted_text','')
+    # extracted_text=session.get('extracted_text','')
 
     resume_data = {
-        "text": session.get("extracted_text", ""),
-        "keywords": session.get("extracted_keywords", []),
-        "skills": session.get("matched_skills", []),
-        "education": session.get("education", ""),
+        "text": session.get("resume_text", ""),
+        "keywords": session.get("resume_keywords", []),
+        "skills": session.get("resume_skills", []),
+        "education": session.get("resume_education", ""),
     }
 
     job_data = {
@@ -185,7 +205,7 @@ def results():
 
     match_score, matched_skills, matched_keywords = calculate_match_score(resume_data, job_data)
 
-    return render_template('results.html',extracted_text=resume_data['text'],matched_skills=matched_skills,matched_keywords=matched_keywords,match_score=match_score)
+    return render_template('results.html',resume_text=resume_data['text'],job_text=job_data['text'] ,matched_skills=matched_skills,matched_keywords=matched_keywords,match_score=match_score)
 
 @app.route('/help')
 def help():
@@ -195,7 +215,7 @@ def help():
 
 
 if __name__=="__main__":
-    app.run(host="127.0.0.1", port=5000 ,debug=True)
+    app.run(host="0.0.0.0", port=5000 ,debug=True)
 
 
 

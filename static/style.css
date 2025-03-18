@@ -19,6 +19,8 @@ h1, h2, h3 {
     padding: 15px;
     text-align: center;
     font-size: 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
 .navbar a {
@@ -39,6 +41,7 @@ form {
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
+    text-align: left;
 }
 
 input, select, button {
@@ -57,6 +60,31 @@ button {
 }
 
 button:hover {
+    background-color: #0056b3;
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Button Primary */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
     background-color: #0056b3;
 }
 
@@ -94,6 +122,7 @@ textarea {
     border-radius: 5px;
     background-color: #f4f4f4;
     resize: none;
+    margin-bottom: 15px;
 }
 
 /* ----- Progress Bar ----- */
@@ -135,4 +164,9 @@ ul li::before {
     content: "✔ ";
     color: #2e7d32;
     font-weight: bold;
+}
+
+/* Content container */
+.content {
+    min-height: 500px;
 }
